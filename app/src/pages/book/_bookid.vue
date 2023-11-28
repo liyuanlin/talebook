@@ -58,7 +58,7 @@
                     </v-card-actions>
                 </v-card>
             </v-dialog>
-
+            <edge-size v-if="dialog_size" :visible.sync="dialog_size" :book_id="edge_book_id"></edge-size>
             <v-card v-if="dialog_refer">
                 <v-toolbar flat dense dark color="primary">
                     从互联网同步书籍信息
@@ -144,8 +144,11 @@
                            target="_blank">
                         <v-icon left v-if="!tiny">import_contacts</v-icon>
                         阅读
-                    </v-btn
-                    >
+                    </v-btn>
+                    <v-btn :small="tiny" dark color="primary" class="mx-2 d-flex d-sm-flex" @click="open_edge(book.id)">
+                        <v-icon left v-if="!tiny">open_in_new</v-icon>
+                        朗读
+                    </v-btn>
 
                     <template v-if="book.is_owner">
                         <v-menu offset-y>
@@ -261,7 +264,7 @@
                 </v-card-text>
             </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" sm="6" md="3">
             <v-card outlined>
                 <v-list>
                     <v-list-item :href="'/read/comm/' + book.id" target="_blank">
@@ -278,7 +281,24 @@
                 </v-list>
             </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" sm="6" md="3">
+            <v-card outlined>
+                <v-list>
+                    <v-list-item @click="open_edge(book.id)">
+                        <v-list-item-avatar large color="primary">
+                            <v-icon dark>open_in_new</v-icon>
+                        </v-list-item-avatar>
+                        <v-list-item-content>
+                            <v-list-item-title>Edge阅读</v-list-item-title>
+                        </v-list-item-content>
+                        <v-list-item-action>
+                            <v-icon>mdi-arrow-right</v-icon>
+                        </v-list-item-action>
+                    </v-list-item>
+                </v-list>
+            </v-card>
+        </v-col>
+        <v-col cols="12" sm="6" md="3">
             <v-card outlined>
                 <v-list>
                     <v-list-item @click="dialog_download = !dialog_download">
@@ -295,7 +315,7 @@
                 </v-list>
             </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" sm="6" md="3">
             <v-card outlined>
                 <v-list>
                     <v-list-item @click="dialog_kindle = !dialog_kindle">
@@ -317,10 +337,11 @@
 
 <script>
 import BookCards from "~/components/BookCards.vue";
-
+import EdgeSize from "~/components/EdgeSize.vue";
 export default {
     components: {
         BookCards,
+        EdgeSize,
     },
     computed: {
         pub_year: function () {
@@ -353,6 +374,8 @@ export default {
         dialog_kindle: false,
         dialog_refer: false,
         dialog_msg: false,
+        dialog_size:false,
+        edge_book_id:0,
         refer_books_loading: false,
         refer_books: [],
         email_rules: function (email) {
@@ -408,6 +431,12 @@ export default {
                     this.$alert("error", rsp.msg, "#");
                 }
             });
+        },
+        open_edge(book_id){
+          this.dialog_size=true;
+          this.edge_book_id=book_id;
+          //let nurl='/read/comm/' + book_id;
+          //window.open(nurl,'_blank');
         },
         get_refer() {
             this.dialog_refer = true;

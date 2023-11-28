@@ -571,7 +571,43 @@ class BookRead(BaseHandler):
             print(e)
             rev=False
         return rev
-        
+    # update image url to something like "/get/extract/16/OEBPS/Images/Chapter%2010.png"
+    def update_image_url(self,book_id,html,file_root,text_file):
+        url_root="/get/extract/"+str(book_id)+"/"  #http url root
+        text_root=os.path.dirname(text_file)# some thing like  "/home/docker-volumes/talebook/data/books/extract/16/OEBPS/Text"
+        html_soup = BeautifulSoup(html, 'html.parser')
+        path_use=text_root[(len(file_root)+1):]
+        pathArray=path_use.split("/")
+        for img in html_soup.findAll('img'):
+            imgUrl=img['src']
+            nUrl=""
+            if imgUrl.startswith('/'):
+                nUrl=url_root+imgUrl.lstrip('/')
+            else:
+                if imgUrl.startswith('./'):
+                    nUrl=url_root+imgUrl.lstrip('./')
+                else:
+                    if imgUrl.startswith('.'):
+                        upArray=imgUrl.split("/")
+                        imgPathArray=[]
+                        for i in range(len(upArray)):
+                            if(upArray[i]==".."):
+                                if len(pathArray)>0:pathArray.pop()
+                            else:
+                                imgPathArray.append(upArray[i])
+                        nUrl=url_root+'/'.join(pathArray)+("" if len(pathArray)==0 else "/")+'/'.join(imgPathArray)
+                    else:
+                        nUrl=url_root+imgUrl
+
+            img['src']= nUrl
+        return str(html_soup)
+    
+    def remove_url_link(self,html):
+        html_soup = BeautifulSoup(html, 'html.parser')
+        for img in html_soup.findAll('a'):
+            img.decompose()
+        return str(html_soup) 
+
     def get_book_content(self,book):        
         fdir = os.path.join(CONF["extract_path"], str(book["id"]))
         json_file=fdir+"/chapter.json"
@@ -594,7 +630,10 @@ class BookRead(BaseHandler):
                     html_content=cfile.read()
                     html_soup = BeautifulSoup(html_content, 'html.parser')
                     body_content = html_soup.find("body")
-                    rev_content+=body_content.decode_contents()
+                    pure_content=body_content.decode_contents()
+                    pure_content=self.update_image_url(book["id"],pure_content,fdir,content_path)
+                    pure_content=self.remove_url_link(pure_content)
+                    rev_content+=pure_content
             return {"menu":self.get_new_menu(json_file,size,page),"content":rev_content}
         else:
             return {"menu":[{"page":page,"size":size,"current":True,"chapter":"chapter1"}],"content":""}

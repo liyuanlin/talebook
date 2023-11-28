@@ -3,3 +3,4 @@ app/.env
 app/dist
 app/.nuxt
 app/node_modules
+docker_build.bat

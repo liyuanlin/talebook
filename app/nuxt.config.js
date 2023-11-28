@@ -44,8 +44,7 @@ export default {
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
     '@nuxtjs/vuetify',
-    '@nuxtjs/google-fonts',
-    '@nuxtjs/google-analytics',
+    '@nuxtjs/google-fonts'
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -63,24 +62,17 @@ export default {
     download: true
   },
 
-  googleAnalytics: {
-    // Used as fallback if no runtime config is provided
-    id: 'G-LLF01B5ZZ8',
-  },
 
   publicRuntimeConfig: {
     head: {
         title: process.env.TITLE || "talebook",
         titleTemplate: process.env.TITLE_TEMPLATE || " %s | talebook",
     },
-    api_url: process.env.API_URL || "http://127.0.0.1:8000",
-    googleAnalytics: {
-      id: process.env.GOOGLE_ANALYTICS_ID,
-    }
+    api_url: process.env.API_URL || "http://127.0.0.1:6085"
   },
 
   server: {
-    port: 9000, // default: 3000
+    port: 9005, // default: 3000
     host: '0.0.0.0' // default: localhost
   },
 
