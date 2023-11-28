@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import functools
+import json
 import logging
 import os
 import queue
@@ -15,7 +16,7 @@ from gettext import gettext as _
 
 import tornado.escape
 from tornado import web
-
+from bs4 import BeautifulSoup
 from webserver import constants, loader, utils
 from webserver.handlers.base import BaseHandler, ListHandler, auth, js
 from webserver.models import Item
@@ -479,7 +480,7 @@ class BookUpload(BaseHandler):
 
 
 class BookRead(BaseHandler):
-    def get(self, id):
+    def get(self,tool,id):
         if not CONF["ALLOW_GUEST_READ"] and not self.current_user:
             return self.redirect("/login")
 
@@ -504,11 +505,19 @@ class BookRead(BaseHandler):
             epub_dir = "/get/extract/%s" % book["id"]
             is_ready = self.is_ready(book)
             self.extract_book(book, fpath, fmt)
-            return self.html_page("book/read.html", {
-                "book": book,
-                "epub_dir": epub_dir,
-                "is_ready": is_ready,
-            })
+            if tool=="edge":
+                return self.html_page("book/edge-read.html", {
+                    "book": book,
+                    "epub_dir": epub_dir,
+                    "is_ready": is_ready,
+                    "chapter":self.get_book_content(book)
+                })
+            else:
+                return self.html_page("book/read.html", {
+                    "book": book,
+                    "epub_dir": epub_dir,
+                    "is_ready": is_ready,
+                })
 
         if "fmt_pdf" in book:
             # PDF类书籍需要检查下载权限。
@@ -529,6 +538,83 @@ class BookRead(BaseHandler):
         fdir = os.path.join(CONF["extract_path"], str(book["id"]))
         return os.path.isfile(fdir + "/META-INF/container.xml")
 
+    def build_chapter_josn(self, book,json_file):
+        fdir = os.path.join(CONF["extract_path"], str(book["id"]))
+        file_name = fdir + "/META-INF/container.xml"
+        if os.path.isfile(json_file):return True
+        rev=True
+        path=""
+        try:
+            with open(file_name, 'r', encoding='utf-8') as f:                   # 读取xml文本
+                html = f.read()
+                pattern = re.compile('<rootfiles>(.*?)</rootfiles>',re.S)   # 正则匹配指定的标签内容
+                file_data = re.findall(pattern, html)[0]
+                file_data = file_data.replace("\n", "").replace("\t", "").replace("\xa0", "").strip()
+                path= re.findall(re.compile('full-path="(.*?)"'), file_data)[0]
+                opf_file=fdir +"/"+ path
+                if os.path.isfile(opf_file): 
+                    with open(opf_file, 'r', encoding='utf-8') as f:            
+                        html = f.read()
+                        pattern = re.compile('<manifest>(.*?)</manifest>',re.S)   # 正则匹配指定的标签内容
+                        file_data = re.findall(pattern, html)[0]
+                        soup = BeautifulSoup("<manifest>"+file_data+"</manifest>", 'xml')
+                        result = soup.find_all("item")
+                        list=[]
+                        for ul in result:# 获取外层标签指定的内容text 
+                            if(ul.attrs["media-type"]=="application/xhtml+xml"):
+                                href = ul.attrs["href"] # 
+                                list.append(href)
+                        with open(json_file, 'w', encoding='utf-8') as jfile:                            
+                            opfRoot=os.path.dirname(opf_file)
+                            jfile.write(json.dumps({"list":list,"opf":opfRoot}))
+        except Exception as e:
+            print(e)
+            rev=False
+        return rev
+        
+    def get_book_content(self,book):        
+        fdir = os.path.join(CONF["extract_path"], str(book["id"]))
+        json_file=fdir+"/chapter.json"
+        page =int(self.get_argument("page",default=1))
+        size =int(self.get_argument("size",default=1))
+        if size==0:size=1
+        if self.build_chapter_josn(book,json_file):
+            idx=0 if page<1 else (page-1)*size
+            with open(json_file, 'r', encoding='utf-8') as jfile:
+                data =json.loads(jfile.read())
+            rev_content=""
+            add_count=0
+            text_list=data["list"]
+            opf_root=data["opf"]
+            for i in range(idx,len(text_list)):
+                if(add_count>=size):break
+                add_count+=1
+                content_path=opf_root +"/"+ text_list[i]
+                with open(content_path, 'r', encoding='utf-8') as cfile:
+                    html_content=cfile.read()
+                    html_soup = BeautifulSoup(html_content, 'html.parser')
+                    body_content = html_soup.find("body")
+                    rev_content+=body_content.decode_contents()
+            return {"menu":self.get_new_menu(json_file,size,page),"content":rev_content}
+        else:
+            return {"menu":[{"page":page,"size":size,"current":True,"chapter":"chapter1"}],"content":""}
+    def get_new_menu(self,json_file,size,page):
+        #beacuse each charpter is changed by size, so we need a new menu
+        with open(json_file, 'r', encoding='utf-8') as jfile:
+            data = json.loads(jfile.read())
+        text_list=data["list"]
+        len_data=len(text_list)
+        total_page=0
+        if len_data%size==0:
+            total_page=int(len_data/size)
+        else:
+            total_page=int(len_data/size) + 1
+        
+        list=[0]*total_page
+        for i in range(total_page):
+            list[i]={"page":i+1,"size":size,"current":page==(i+1),"chapter":"chapter"+str(i+1)}
+        return list
+        
     @background
     def extract_book(self, book, fpath, fmt):
         # 解压后的目录
@@ -699,5 +785,5 @@ def routes():
         (r"/api/book/([0-9]+)\.(.+)", BookDownload),
         (r"/api/book/([0-9]+)/push", BookPush),
         (r"/api/book/([0-9]+)/refer", BookRefer),
-        (r"/read/([0-9]+)", BookRead),
+        (r"/read/(?P<tool>[(comm)|(edge)]+)/(?P<id>\d*)", BookRead),
     ]

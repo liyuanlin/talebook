@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta content="black" name="apple-mobile-web-app-status-bar-style">
+		
+        <link rel="shortcut icon" href="{{IMG}}/get/thumb_144_144/{{book.id}}.png?t={{book.timestamp}}" />
+        <link rel="apple-touch-icon" href="{{IMG}}/get/thumb_144_144/{{book.id}}.png?t={{book.timestamp}}" />
+        <link rel="apple-touch-icon-precomposed" href="{{IMG}}/get/thumb_144_144/{{book.id}}.png?t={{book.timestamp}}" />
+        
+        <link rel="stylesheet" type="text/css" href='{{static_url("edge-adapter/css/bootstrap.min.css")}}'>
+		<link rel="stylesheet" href='{{static_url("edge-adapter/css/bootstrap-theme.min.css")}}' />
+		<link rel="stylesheet" href='{{static_url("edge-adapter/css/style.css")}}' />
+        <script type="text/javascript" src='{{static_url("js/jquery-1.11.1.min.js")}}'></script>
+        <script type="text/javascript" src='{{static_url("edge-adapter/js/bootstrap.min.js")}}'></script>
+        <script type="text/javascript" src='{{static_url("edge-adapter/js/ydui.flexible.js")}}'></script>
+        <script type="text/javascript" src='{{static_url("edge-adapter/js/popper.js")}}'></script>
+		<title>Read</title>
+	</head>
+	<body>
+	    <div class="popup-bg"></div>
+	    <div class="container">
+        	<!--小说-->
+        	<div class="read-Fiction">
+        		<div class="read-operating box">
+        			<a href="javascript:void(0);" class="fontSizePlus btn btn-default box-flex">A+</a>
+        			<a href="javascript:void(0);" class="fontReset btn btn-info box-flex">复位</a>
+        			<a href="javascript:void(0);" class="fontSizeMinus btn btn-default box-flex">A-</a>
+        			<a href="javascript:void(0);" class="openlamp btn btn-warning box-flex">关闭</a>
+        			<a href="javascript:void(0);" class="closelamp btn btn-success box-flex">护眼</a>
+        		</div>
+        		<div class="article-content">
+        		    {{chapter.content}}
+        		</div>	 
+			</div>
+		</div>
+		<div class="sticky">
+            <a href="javascript:void(0)" onclick="menu_toggle()">
+                <span class="glyphicon glyphicon-th-list"></span>
+            </a>
+        </div>
+		<nav id="bs-navbar">
+        		    <a class="close" href="javascript:void(0)" onclick="menu_toggle()">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </a>
+					<ul class="chapter">
+					    {% for m in chapter.menu %}
+                           <li>
+							<a href="?page={{m.page}}&size={{m.size}}" target="_self">{{m.chapter}}</a>
+						   </li>
+                        {% endfor %}
+					</ul>
+				</nav>
+	</body>
+</html>
+<script>
+		/*****************文字放大缩小****************/
+
+$(document).ready(function (){
+	//最小字号
+	var min=14;
+	//最大字号
+	var max=46;
+
+	var reset = $('body').css('fontSize');
+
+	var elm = $('.article-content');
+
+	var size = str_replace(reset, 'px', '');
+
+	//放大字体
+	$('a.fontSizePlus').click(function() {
+		if (size<=max) {
+			//增加大小
+			size++;
+			//设定字体尺寸
+			elm.css({'fontSize' : size,'line-height':size*2+"px"});
+		}
+		//取消一个单击事件
+		return false;
+
+	});
+
+	$('a.fontSizeMinus').click(function() {
+		//如果字体大小更大或比最小值相等
+		if (size>=min) {
+			//减少尺寸
+			size--;
+			//设定字体尺寸
+			elm.css({'fontSize' : size,'line-height':size*2+"px"});
+		}
+		//取消一个单击事件
+		return false;
+	});
+	$(".openlamp").on("click",function(){
+		$('body').css({'background':'#ffffff','color':'#000000'})
+		$('body').removeClass("Eye_protection");
+
+	});
+	$(".closelamp").on("click",function(){
+		$('body').css({'background':'#fff9d8','color':'#333333'});
+		$('body').addClass("Eye_protection");
+
+	});
+	//重置字体大小
+	$('a.fontReset').click(function () {
+		//设置默认字体大小
+		 elm.css({'fontSize' : reset});
+	});
+
+});
+//一个字符串替换函数
+function str_replace(haystack, needle, replacement) {
+	var temp = haystack.split(needle);
+	return temp.join(replacement);
+}
+
+function menu_toggle(){
+    if($('body').hasClass('menu-show')) {
+        $('body').removeClass('menu-show');
+        $('.popup-bg').fadeOut(400);
+		$('#bs-navbar').removeClass('show');
+	} else {
+		$('body').addClass('menu-show');
+        $('.popup-bg').fadeIn(200);
+		$('#bs-navbar').addClass('show');
+	}
+}
+
+</script>

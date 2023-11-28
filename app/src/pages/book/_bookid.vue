@@ -140,7 +140,7 @@
                         推送
                     </v-btn
                     >
-                    <v-btn :small="tiny" dark color="primary" class="mx-2 d-flex d-sm-flex" :href="'/read/' + book.id"
+                    <v-btn :small="tiny" dark color="primary" class="mx-2 d-flex d-sm-flex" :href="'/read/comm/' + book.id"
                            target="_blank">
                         <v-icon left v-if="!tiny">import_contacts</v-icon>
                         阅读
@@ -264,7 +264,7 @@
         <v-col cols="12" sm="6" md="4">
             <v-card outlined>
                 <v-list>
-                    <v-list-item :href="'/read/' + book.id" target="_blank">
+                    <v-list-item :href="'/read/comm/' + book.id" target="_blank">
                         <v-list-item-avatar large color="primary">
                             <v-icon dark>import_contacts</v-icon>
                         </v-list-item-avatar>

@@ -12,7 +12,7 @@
                                 <v-icon class="pa-0 ma-0">{{ item.icon }}</v-icon>
                             </v-list-item-action>
                             <v-list-item-content>
-                                <v-list-item-title v-text="item.text"> 管理员 </v-list-item-title>
+                                <v-list-item-title v-text="item.text"></v-list-item-title>
                             </v-list-item-content>
                         </template>
 
@@ -56,9 +56,6 @@
                         </v-list-item-action>
                     </v-list-item>
                 </template>
-                <v-list-item>
-                    <v-img class="ma-auto" max-width="128" src="/logo/link.png"></v-img>
-                </v-list-item>
             </v-list>
         </v-navigation-drawer>
 
