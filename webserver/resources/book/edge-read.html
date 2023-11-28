@@ -55,7 +55,7 @@
 					<ul class="chapter">
 					    {% for m in chapter.menu %}
                            <li>
-							<a href="?page={{m.page}}&size={{m.size}}" target="_self">{{m.chapter}}</a>
+							<a href="?page={{m.page}}&size={{m.size}}" class="{{'current' if m.current else ''}}" target="_self">{{m.chapter}}</a>
 						   </li>
                         {% endfor %}
 					</ul>

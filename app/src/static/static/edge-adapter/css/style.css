@@ -64,6 +64,10 @@ body {
   margin-block-start:0px;
   padding-inline-start: 18px;
 }
+.chapter .current{
+  color: #ff0000;
+  font-weight: 700;
+}
 @namespace h "http://www.w3.org/1999/xhtml";
 
 .bold {
