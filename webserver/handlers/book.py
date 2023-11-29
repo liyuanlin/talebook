@@ -634,9 +634,10 @@ class BookRead(BaseHandler):
                     pure_content=self.update_image_url(book["id"],pure_content,fdir,content_path)
                     pure_content=self.remove_url_link(pure_content)
                     rev_content+=pure_content
-            return {"menu":self.get_new_menu(json_file,size,page),"content":rev_content}
+            all_menus=self.get_new_menu(json_file,size,page)
+            return {"menu":all_menus,"page":{"size":size,"page":page,"count":len(all_menus)},"content":rev_content}
         else:
-            return {"menu":[{"page":page,"size":size,"current":True,"chapter":"chapter1"}],"content":""}
+            return {"menu":[{"page":page,"size":size,"current":True,"chapter":"chapter1"}],"page":{"size":size,"page":page},"content":""}
     def get_new_menu(self,json_file,size,page):
         #beacuse each charpter is changed by size, so we need a new menu
         with open(json_file, 'r', encoding='utf-8') as jfile:

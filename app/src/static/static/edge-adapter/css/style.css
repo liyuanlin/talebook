@@ -53,6 +53,17 @@ body {
   color: #ff0000;
   font-weight: 700;
 }
+.previous-next{
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+.previous-next .previous{
+  margin-right: 10px;
+}
+.previous-next .next{
+  margin-left: 10px;
+}
 @namespace h "http://www.w3.org/1999/xhtml";
 
 .bold {

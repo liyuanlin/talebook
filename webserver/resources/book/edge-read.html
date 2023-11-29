@@ -24,7 +24,7 @@
         <script type="text/javascript" src='{{static_url("js/jquery-1.11.1.min.js")}}'></script>
         <script type="text/javascript" src='{{static_url("edge-adapter/js/bootstrap.min.js")}}'></script>
         <script type="text/javascript" src='{{static_url("edge-adapter/js/asidenav.js")}}'></script>
-		<title>Read</title>
+		<title>{{book.title}}</title>
 	</head>
 	<body>
 	    <div class="popup-bg"></div>
@@ -34,6 +34,18 @@
         		<div class="article-content">
         		    {{chapter.content}}
         		</div>	 
+				<div class="previous-next">
+					{% if chapter.page.page > 0 %}
+					<a href="?page={{chapter.page.page-1}}&size={{chapter.page.size}}"  target="_self">Previous</a>
+					{% else %}
+					<a href="javascript:void(0)">First Page</a>
+					{% endif %}
+					{% if (chapter.page.page+1) < chapter.page.count %}
+					<a href="?page={{chapter.page.page+1}}&size={{chapter.page.size}}"  target="_self">Next</a>
+					{% else %}
+					<a href="javascript:void(0)">Last Page</a>
+					{% endif %}
+				</div>
 			</div>
 		</div>
 		<!-- Start Nav Structure -->
