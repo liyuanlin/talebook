@@ -13,21 +13,6 @@ body {
   text-align: left;
   text-indent: 2em;
 }
-.sticky{
-  position: fixed;
-  padding-top: 2px;
-  top:calc(100vh - 80px);
-  right: 20px;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  border-radius: 15px;
-  background-color: #DDDDDD;
-  text-align: center;
-}
-.sticky .glyphicon{
-  color: #FFF;
-}
 #bs-navbar{
   display: none;
   width:100vw;
@@ -46,9 +31,9 @@ body {
   width: 100%;
 }
 .close{
-  display: block;
-  float: right;
-  padding-right: 18px;
+  position: fixed;
+  top:9px;
+  right: 9px;
   height: 30px;
   width: 30px;
   background-color: #000;

@@ -20,10 +20,10 @@
         <link rel="stylesheet" type="text/css" href='{{static_url("edge-adapter/css/bootstrap.min.css")}}'>
 		<link rel="stylesheet" href='{{static_url("edge-adapter/css/bootstrap-theme.min.css")}}' />
 		<link rel="stylesheet" href='{{static_url("edge-adapter/css/style.css")}}' />
+		<link rel="stylesheet" href='{{static_url("edge-adapter/css/asidenav-menu.css")}}' />
         <script type="text/javascript" src='{{static_url("js/jquery-1.11.1.min.js")}}'></script>
         <script type="text/javascript" src='{{static_url("edge-adapter/js/bootstrap.min.js")}}'></script>
-        <script type="text/javascript" src='{{static_url("edge-adapter/js/ydui.flexible.js")}}'></script>
-        <script type="text/javascript" src='{{static_url("edge-adapter/js/popper.js")}}'></script>
+        <script type="text/javascript" src='{{static_url("edge-adapter/js/asidenav.js")}}'></script>
 		<title>Read</title>
 	</head>
 	<body>
@@ -31,23 +31,29 @@
 	    <div class="container">
         	<!--小说-->
         	<div class="read-Fiction">
-        		<div class="read-operating box">
-        			<a href="javascript:void(0);" class="fontSizePlus btn btn-default box-flex">A+</a>
-        			<a href="javascript:void(0);" class="fontReset btn btn-info box-flex">复位</a>
-        			<a href="javascript:void(0);" class="fontSizeMinus btn btn-default box-flex">A-</a>
-        			<a href="javascript:void(0);" class="openlamp btn btn-warning box-flex">关闭</a>
-        			<a href="javascript:void(0);" class="closelamp btn btn-success box-flex">护眼</a>
-        		</div>
         		<div class="article-content">
         		    {{chapter.content}}
         		</div>	 
 			</div>
 		</div>
-		<div class="sticky">
-            <a href="javascript:void(0)" onclick="menu_toggle()">
-                <span class="glyphicon glyphicon-th-list"></span>
-            </a>
-        </div>
+		<!-- Start Nav Structure -->
+        <svg width="0" height="0">
+              <defs>
+                  <filter id="goo">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"></feGaussianBlur>
+                      <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo"></feColorMatrix>
+                      <feComposite in="SourceGraphic" in2="goo" operator="atop"></feComposite>
+                  </filter>
+              </defs>
+          </svg>
+          <div class="aside-nav bounceInUp animated" id="aside-nav">
+              <label for="" class="aside-menu" title="按住拖动"><span class="glyphicon glyphicon-th-list"></span></label>
+              <a href="javascript:void(0)" title="目录" class="menu-item menu-first toggleChapter">章节<br>目录</a>
+              <a href="javascript:void(0)" title="字体放大" class="menu-item menu-second fontSizePlus">字体+</a>
+              <a href="javascript:void(0)" title="字体缩小" class="menu-item menu-third fontSizeMinus">字体-</a>
+              <a href="javascript:void(0)" title="护眼开关" class="menu-item menu-line menu-fourth openlamp">护眼<br>开</a>
+          </div>
+		<!-- End of Nav Structure -->
 		<nav id="bs-navbar">
         		    <a class="close" href="javascript:void(0)" onclick="menu_toggle()">
                         <span class="glyphicon glyphicon-remove"></span>
@@ -63,7 +69,7 @@
 	</body>
 </html>
 <script>
-		/*****************文字放大缩小****************/
+	/*****************文字放大缩小****************/
 
 $(document).ready(function (){
 	//最小字号
@@ -76,7 +82,8 @@ $(document).ready(function (){
 	var elm = $('.article-content');
 
 	var size = str_replace(reset, 'px', '');
-
+//放大字体
+$('a.toggleChapter').click(menu_toggle);
 	//放大字体
 	$('a.fontSizePlus').click(function() {
 		if (size<=max) {
@@ -102,14 +109,15 @@ $(document).ready(function (){
 		return false;
 	});
 	$(".openlamp").on("click",function(){
-		$('body').css({'background':'#ffffff','color':'#000000'})
-		$('body').removeClass("Eye_protection");
-
-	});
-	$(".closelamp").on("click",function(){
-		$('body').css({'background':'#fff9d8','color':'#333333'});
-		$('body').addClass("Eye_protection");
-
+    if($('body').hasClass('Eye_protection')) {
+		  $('body').css({'background':'#ffffff','color':'#000000'})
+		  $('body').removeClass("Eye_protection");
+      $(".openlamp").html("护眼<br>开")
+    }else{
+      $('body').css({'background':'#fff9d8','color':'#333333'});
+		  $('body').addClass("Eye_protection");
+      $(".openlamp").html("护眼<br>关")
+    }
 	});
 	//重置字体大小
 	$('a.fontReset').click(function () {
@@ -124,15 +132,22 @@ function str_replace(haystack, needle, replacement) {
 	return temp.join(replacement);
 }
 
+
+$("#aside-nav").scrollupmenu();
 function menu_toggle(){
     if($('body').hasClass('menu-show')) {
-        $('body').removeClass('menu-show');
-        $('.popup-bg').fadeOut(400);
-		$('#bs-navbar').removeClass('show');
+	  $("html").css({"overflow":"auto"});
+      $('body').removeClass('menu-show');
+      $('.popup-bg').fadeOut(400);
+	  $('#bs-navbar').removeClass('show');
 	} else {
-		$('body').addClass('menu-show');
-        $('.popup-bg').fadeIn(200);
-		$('#bs-navbar').addClass('show');
+	  $("html").css({"overflow":"hidden"});
+	  $('body').addClass('menu-show');
+      $('.popup-bg').fadeIn(200);
+	  $('#bs-navbar').addClass('show');
+	  var winScroll=$("html,body").scrollTop();
+      var offsetTop = $('#bs-navbar .current').offset().top-winScroll;
+      $("#bs-navbar").animate({scrollTop:offsetTop}, 500);
 	}
 }
 
