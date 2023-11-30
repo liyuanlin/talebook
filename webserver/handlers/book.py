@@ -597,7 +597,7 @@ class BookRead(BaseHandler):
                                 imgPathArray.append(upArray[i])
                         nUrl=url_root+'/'.join(pathArray)+("" if len(pathArray)==0 else "/")+'/'.join(imgPathArray)
                     else:
-                        nUrl=url_root+imgUrl
+                        nUrl=url_root+'/'.join(pathArray)+("" if len(pathArray)==0 else "/")+imgUrl
 
             img['src']= nUrl
         return str(html_soup)
