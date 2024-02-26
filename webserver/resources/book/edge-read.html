@@ -40,7 +40,7 @@
 					{% else %}
 					<a href="javascript:void(0)">First Page</a>
 					{% endif %}
-					{% if (chapter.page.page+1) < chapter.page.count %}
+					{% if (chapter.page.page) < chapter.page.count %}
 					<a href="?page={{chapter.page.page+1}}&size={{chapter.page.size}}"  target="_self">Next</a>
 					{% else %}
 					<a href="javascript:void(0)">Last Page</a>

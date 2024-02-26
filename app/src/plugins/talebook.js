@@ -34,7 +34,6 @@ export default ({ app }, inject) => {
         }
 
         var full_url = server + "/api" + url;
-
         if (options !== undefined) {
             Object.assign(args, options);
         }

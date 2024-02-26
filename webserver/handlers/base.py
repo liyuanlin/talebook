@@ -8,6 +8,7 @@ import hashlib
 import logging
 import os
 import time
+import urllib
 from collections import defaultdict
 from gettext import gettext as _
 
@@ -135,9 +136,13 @@ class BaseHandler(web.RequestHandler):
         return True
 
     def send_error_of_not_invited(self):
-        self.write({"err": "not_invited"})
-        self.set_status(200)
-        raise web.Finish()
+        path=self.request.path
+        if path.startswith("/read/"):
+            return self.redirect("/welcome?next="+urllib.parse.quote_plus(self.request.uri))
+        else:
+            self.write({"err": "not_invited"})
+            self.set_status(200)
+            raise web.Finish()
 
     def should_be_invited(self):
         if self.need_invited():

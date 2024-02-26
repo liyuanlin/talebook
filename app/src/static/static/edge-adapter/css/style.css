@@ -52,6 +52,7 @@ body {
   list-style: none;
   margin-block-start:0px;
   padding-inline-start: 18px;
+  padding-bottom: 60px;
 }
 .chapter .current{
   color: #ff0000;
